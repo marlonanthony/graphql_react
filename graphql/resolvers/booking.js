@@ -17,7 +17,7 @@ module.exports = {
         if(!req.isAuth) { throw new Error('Unauthenticated!') }
         const fetchedEvent = await Event.findOne({ _id: args.eventId })
         const booking = new Booking({
-            user: '5cd4dfc12776560719e20786',
+            user: req.userId,
             event: fetchedEvent
         })
         const result = await booking.save() 
