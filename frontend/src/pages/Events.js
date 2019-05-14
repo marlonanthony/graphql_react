@@ -35,7 +35,7 @@ class EventsPage extends Component {
         this.setState({ creating: true })
     }
 
-    modalConfirmHandler = () => {
+    modalConfirmHandler = async () => {
         this.setState({ creating: false })
         const title = this.titleElRef.current.value 
         const price = +this.priceElRef.current.value 
@@ -69,21 +69,21 @@ class EventsPage extends Component {
 
         const token = this.context.token
 
-        fetch('http://localhost:5000/graphql', {
-            method: 'POST',
-            body: JSON.stringify(reqBody),
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + token 
-            }
-        })
-        .then(res => {
+        try {
+            const res = await fetch('http://localhost:5000/graphql', {
+                method: 'POST',
+                body: JSON.stringify(reqBody),
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + token 
+                }
+            })
+        
             if(res.status !== 200 && res.status !== 201) {
                 throw new Error('Failed!')
             }
-            return res.json() 
-        })
-        .then((resData) => {
+
+            const resData = await res.json() 
             this.setState(prevState => { 
                 const updatedEvents = [ ...prevState.events ] 
                 updatedEvents.push({
@@ -98,15 +98,15 @@ class EventsPage extends Component {
                 })
                 return { events: updatedEvents }
             })
-        })
-        .catch(err => console.log(err))
+        }
+        catch(err) { console.log(err) }
     }
 
     modalCancelHandler = () => {
         this.setState({ creating: false, selectedEvent: null })
     }
 
-    fetchevents = () => {
+    fetchevents = async () => {
         this.setState({ isLoading: true }) 
 
         const reqBody = {
@@ -127,28 +127,28 @@ class EventsPage extends Component {
             `
             
         }
-
-        fetch('http://localhost:5000/graphql', {
-            method: 'POST',
-            body: JSON.stringify(reqBody),
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        })
-        .then(res => {
+        try {
+            const res = await fetch('http://localhost:5000/graphql', {
+                method: 'POST',
+                body: JSON.stringify(reqBody),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+          
             if(res.status !== 200 && res.status !== 201) {
                 throw new Error('Failed!')
             }
-            return res.json() 
-        })
-        .then(resData => {
+
+            const resData = await res.json() 
             const events = resData.data.events 
             if(this.isActive) this.setState({ events, isLoading: false })
-        })
-        .catch(err => {
+        }
+
+        catch(err){
             console.log(err)
             if(this.isActive) this.setState({ isLoading: false })
-        })
+        }
     }
 
     showDetailHandler = eventId => {
@@ -158,7 +158,7 @@ class EventsPage extends Component {
         })
     }
 
-    bookEventHandler = () => {
+    bookEventHandler = async () => {
         if(!this.context.token) {
             this.setState({ selectedEvent: null })
             return 
@@ -180,28 +180,71 @@ class EventsPage extends Component {
             
         }
 
-        fetch('http://localhost:5000/graphql', {
-            method: 'POST',
-            body: JSON.stringify(reqBody),
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + this.context.token
-            }
-        })
-        .then(res => {
+        try {
+            const res = await fetch('http://localhost:5000/graphql', {
+                method: 'POST',
+                body: JSON.stringify(reqBody),
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + this.context.token
+                }
+            })
+    
             if(res.status !== 200 && res.status !== 201) {
                 throw new Error('Failed!')
             }
-            return res.json() 
-        })
-        .then(resData => {
+            const resData = await res.json() 
             console.log(resData)
             this.setState({ selectedEvent: null })
-        })
-        .catch(err => {
+        }
+        catch(err) {
             console.log(err)
-        })
+        }
     }
+    // bookEventHandler = () => {
+    //     if(!this.context.token) {
+    //         this.setState({ selectedEvent: null })
+    //         return 
+    //     }
+
+    //     const reqBody = {
+    //         query: `
+    //             mutation BookEvent($id: ID!) {
+    //                 bookEvent(eventId: $id) {
+    //                     _id
+    //                     createdAt
+    //                     updatedAt
+    //                 }
+    //             }
+    //         `, 
+    //         variables: {
+    //             id: this.state.selectedEvent._id
+    //         }
+            
+    //     }
+
+    //     fetch('http://localhost:5000/graphql', {
+    //         method: 'POST',
+    //         body: JSON.stringify(reqBody),
+    //         headers: {
+    //             'Content-Type': 'application/json',
+    //             'Authorization': 'Bearer ' + this.context.token
+    //         }
+    //     })
+    //     .then(res => {
+    //         if(res.status !== 200 && res.status !== 201) {
+    //             throw new Error('Failed!')
+    //         }
+    //         return res.json() 
+    //     })
+    //     .then(resData => {
+    //         console.log(resData)
+    //         this.setState({ selectedEvent: null })
+    //     })
+    //     .catch(err => {
+    //         console.log(err)
+    //     })
+    // }
 
     componentWillUnmount() {
         this.isActive = false 
