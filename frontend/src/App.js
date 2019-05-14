@@ -17,6 +17,8 @@ class App extends Component {
   
   login = (token, userId, tokenExpiration) => {
     this.setState({ token, userId })
+    localStorage.setItem('jwtToken', token) 
+    console.log(localStorage)
   }
 
   logout = () => {
