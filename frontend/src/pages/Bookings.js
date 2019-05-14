@@ -15,7 +15,7 @@ class BookingsPage extends Component {
         this.fetchBookings() 
     }
 
-    fetchBookings = () => {
+    fetchBookings = async () => {
         this.setState({ isLoading: true })
 
         const reqBody = {
@@ -36,31 +36,31 @@ class BookingsPage extends Component {
             
         }
 
-        fetch('http://localhost:5000/graphql', {
+        try {
+            const res = await fetch('http://localhost:5000/graphql', {
             method: 'POST',
             body: JSON.stringify(reqBody),
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': 'Bearer ' + this.context.token 
             }
-        })
-        .then(res => {
+            })
+
             if(res.status !== 200 && res.status !== 201) {
                 throw new Error('Failed!')
             }
-            return res.json()
-        })
-        .then(resData => {
+            const resData = await res.json()
             const bookings = resData.data.bookings 
             this.setState({ bookings, isLoading: false })
-        })
-        .catch(err => {
+        }
+
+        catch(err) {
             console.log(err)
             this.setState({ isLoading: false })
-        })
+        }
     }
 
-    deleteBookingHandler = bookingId => {
+    deleteBookingHandler = async bookingId => {
         this.setState({ isLoading: true })
 
         const reqBody = {
@@ -78,32 +78,32 @@ class BookingsPage extends Component {
             
         }
 
-        fetch('http://localhost:5000/graphql', {
-            method: 'POST',
-            body: JSON.stringify(reqBody),
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + this.context.token 
-            }
-        })
-        .then(res => {
+        try {
+            const res = await fetch('http://localhost:5000/graphql', {
+                method: 'POST',
+                body: JSON.stringify(reqBody),
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + this.context.token 
+                }
+            })
+            
             if(res.status !== 200 && res.status !== 201) {
                 throw new Error('Failed!')
             }
-            return res.json()
-        })
-        .then(resData => {
+    
             this.setState( prevState => { 
                 const updatedBookings = prevState.bookings.filter(booking => {
                     return booking._id !== bookingId 
                 })
                 return { bookings: updatedBookings, isLoading: false }
             })
-        })
-        .catch(err => {
+        }
+
+        catch(err) {
             console.log(err)
             this.setState({ isLoading: false })
-        })
+        }
     }
 
     changeOutputTypeHandler = outputType => {
