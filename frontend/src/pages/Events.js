@@ -201,50 +201,6 @@ class EventsPage extends Component {
             console.log(err)
         }
     }
-    // bookEventHandler = () => {
-    //     if(!this.context.token) {
-    //         this.setState({ selectedEvent: null })
-    //         return 
-    //     }
-
-    //     const reqBody = {
-    //         query: `
-    //             mutation BookEvent($id: ID!) {
-    //                 bookEvent(eventId: $id) {
-    //                     _id
-    //                     createdAt
-    //                     updatedAt
-    //                 }
-    //             }
-    //         `, 
-    //         variables: {
-    //             id: this.state.selectedEvent._id
-    //         }
-            
-    //     }
-
-    //     fetch('http://localhost:5000/graphql', {
-    //         method: 'POST',
-    //         body: JSON.stringify(reqBody),
-    //         headers: {
-    //             'Content-Type': 'application/json',
-    //             'Authorization': 'Bearer ' + this.context.token
-    //         }
-    //     })
-    //     .then(res => {
-    //         if(res.status !== 200 && res.status !== 201) {
-    //             throw new Error('Failed!')
-    //         }
-    //         return res.json() 
-    //     })
-    //     .then(resData => {
-    //         console.log(resData)
-    //         this.setState({ selectedEvent: null })
-    //     })
-    //     .catch(err => {
-    //         console.log(err)
-    //     })
-    // }
 
     componentWillUnmount() {
         this.isActive = false 

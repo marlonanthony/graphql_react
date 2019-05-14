@@ -20,7 +20,7 @@ class AuthPage extends Component {
         })
     }
 
-    submitHandler = (e) => {
+    submitHandler = async (e) => {
         e.preventDefault() 
         const email = this.emailEl.current.value 
         const password = this.passwordEl.current.value
@@ -48,7 +48,7 @@ class AuthPage extends Component {
         if(!this.state.isLogin) {
             reqBody = {
                 query: `
-                    mutation CreateUser($email: String, $password: String!) {
+                    mutation CreateUser($email: String!, $password: String!) {
                         createUser(userInput: { email: $email, password: $password }) {
                             _id
                             email
@@ -62,20 +62,20 @@ class AuthPage extends Component {
             }
         }
 
-        fetch('http://localhost:5000/graphql', {
-            method: 'POST',
-            body: JSON.stringify(reqBody),
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        })
-        .then(res => {
+        try {
+            const res = await fetch('http://localhost:5000/graphql', {
+                method: 'POST',
+                body: JSON.stringify(reqBody),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+        
             if(res.status !== 200 && res.status !== 201) {
                 throw new Error('Failed!')
             }
-            return res.json() 
-        })
-        .then(resData => {
+            const resData = await res.json() 
+
             if(resData.data.login.token) {
                 this.context.login(
                     resData.data.login.token, 
@@ -83,8 +83,8 @@ class AuthPage extends Component {
                     resData.data.login.tokenExpiration
                 )
             }
-        })
-        .catch(err => console.log(err))
+        }
+        catch(err) { console.log(err) }
     }
 
     render() {
